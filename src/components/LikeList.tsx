@@ -3,58 +3,7 @@ import { useEffect, useState } from "react"
 
 export default LikeList
 
-interface Place {
-    id: string
-    title: string
-    image: {
-        src: string
-        alt:string
-    }
-    lat: number
-    lon: number
-    description: string
-}
-
-class ApiFetcher {
-    private baseUrl: string;
-
-    constructor() {
-        this.baseUrl = "http://localhost:3000"
-    }
-
-    async getList<T>(endpoint: string): Promise<T> {
-        try {
-            const res = await axios.get(`${ this.baseUrl }${ endpoint }`)
-            return res.data;
-        }
-        catch (error: unknown) {
-            console.log("응 못받아옴 ㅅㄱ");
-            throw error;
-        }
-    }
-}
-
-const api = new ApiFetcher();
-
 function LikeList() {
-
-    const [list, setList] = useState<Place[]>([]);
-
-
-    useEffect(() => {
-        const fetchPlaces = async () => {
-            try {
-                const data = await api.getList<{ places: Place[] }>('/places');
-                setList(data.places);
-            } catch (err: any) {
-                console.log("응 못받아옴 ㅅㄱ ")
-            }
-        };
-
-        fetchPlaces();
-    }, []);
-
-
 
     return (
         <>

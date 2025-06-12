@@ -1,60 +1,74 @@
 import axios from "axios";
 import { useEffect, useState } from "react"
+import { api } from "../api/ApiFetcher"
+import type { Place } from "../types/types";
+import { sortPlacesByDistance } from "../location/loc";
 
 export default Main
-
-interface Place {
-    id: string
-    title: string
-    image: {
-        src: string
-        alt:string
-    }
-    lat: number
-    lon: number
-    description: string
-}
-
-class ApiFetcher {
-    private baseUrl: string;
-
-    constructor() {
-        this.baseUrl = "http://localhost:3000"
-    }
-
-    async getList<T>(endpoint: string): Promise<T> {
-        try {
-            const res = await axios.get(`${ this.baseUrl }${ endpoint }`)
-            return res.data;
-        }
-        catch (error: unknown) {
-            console.log("응 못받아옴 ㅅㄱ");
-            throw error;
-        }
-    }
-}
-
-const api = new ApiFetcher();
 
 function Main() {
 
     const [list, setList] = useState<Place[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(false);
+    const [location, setLocation] = useState<null | { latitude: number; longitude: number }>(null);
+
+
+    useEffect(() => {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const positionObj = {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude
+                };
+                setLocation(positionObj);
+                console.log("현재 위치:", positionObj);
+            },
+            (err) => {
+                console.error("위치 접근 거부됨", err);
+                alert(`위치 접근을 허용해주세요. 
+${err}`)
+                setLocation(null);
+            }
+        );
+    }, []);
 
 
     useEffect(() => {
         const fetchPlaces = async () => {
             try {
+                setIsLoading(true);
+                setError(false);
                 const data = await api.getList<{ places: Place[] }>('/places');
-                setList(data.places);
-                console.log(data.places[0].image.src);
-            } catch (err: any) {
-                console.log("응 못받아옴 ㅅㄱ ")
+
+                if (location) {
+                    const sorted = sortPlacesByDistance(data.places, location.latitude, location.longitude);
+                    setList(sorted);
+                } else {
+                    setList(data.places);
+                }
+
+            } catch (err: unknown) {
+                console.log("못받아옴 ㅅㄱ ")
+                setError(true);
+            } finally {
+                setIsLoading(false);
             }
         };
 
         fetchPlaces();
-    }, []);
+    }, [location]);
 
+    if (isLoading) {
+        return (
+            <div className="text-2xl text-center">ㄱㄷㄱㄷ 로딩중임.</div>
+        )
+    }
+    if (error) {
+        return (
+            <div className="text-2xl text-center">404 에러남.</div>
+        )
+    }
 
 
     return (
@@ -78,3 +92,4 @@ function Main() {
         </>
     )
 }
+
