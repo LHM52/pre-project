@@ -111,12 +111,16 @@ export default function Main() {
 
     if (isLoading) {
         return (
-            <div className="text-2xl text-center">ㄱㄷㄱㄷ 로딩중..</div>
+            <div className="flex items-center justify-center min-h-screen">
+                <span className="text-xl font-semibold">ㄱㄷㄱㄷ 로딩중...</span>
+            </div>
         )
     }
     if (error) {
         return (
-            <div className="text-2xl text-center">404 에러임.</div>
+            <div className="flex items-center justify-center min-h-screen">
+                <span className="text-2xl font-bold text-red-500">404 없는 페이지임.</span>
+            </div>
         )
     }
 

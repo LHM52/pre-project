@@ -32,7 +32,7 @@ export default function LikeList() {
                                 setIsModal(false);
                                 setDeleteId(null);
                             }}>네</button>
-                            <button className="p-2 w-[100px] h-[50px]" onClick={() => setIsModal(false)}>아니오</button>
+                            <button className="p-2 w-[100px] h-[50px] border-[1px]" onClick={() => setIsModal(false)}>아니오</button>
                         </div>
                     </div>
                 </div>
